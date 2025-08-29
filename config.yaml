@@ -1,0 +1,33 @@
+
+# === Backtest Config (edit me) ===
+# Secrets: put MONGODB_URI in `.env` (see .env.example).
+
+# Optional CSV fallback (if set, use CSV instead of Mongo):
+# csv_path: "/path/to/klines.csv"
+
+mongo_db: "market_info"
+mongo_coll: "BNBUSDT_1h_Binance"
+
+symbol: "BNBUSDT"
+interval: "1h"
+
+# ISO8601 or epoch ms
+start: "2025-01-01T00:00:00Z"
+end:   "2025-06-01T00:00:00Z"
+
+# original features
+x_cols: ["open","high","low","close","quotevolume","tradenum","volume",
+          "vrb_bb_upper","vrb_bb_lower","st_line","st_dir","st_up","st_dn"]
+# x_cols: ["open","high","low","close","quotevolume","tradenum","volume"]
+
+# rolling Z score
+x_z_cols: ["open","high","low","close","quotevolume","tradenum","volume",
+          "vrb_bb_upper","vrb_bb_lower","st_line","st_up","st_dn"]
+
+ckpt_path: "model/checkpoints/vrb/20250818-170004_best_forBTC.pt"
+device: null
+
+fee_bps: 1.0
+slippage_bps: 0.0
+initial_capital: 10000.0
+threshold: 0.0

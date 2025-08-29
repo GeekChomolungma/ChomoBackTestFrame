@@ -1,0 +1,6 @@
+*.exe
+env/
+__pycache__/
+results/
+wandb/
+checkpoints/
