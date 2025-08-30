@@ -6,12 +6,12 @@ from iowrapper.mongo_shell import MongoShell
 from iowrapper.data_adapters import MongoKlineSource
 from model.model_wrapper import ChomoModelWrapper
 from strategy.strategies import PortfolioCfg, ExecutionCfg, buy_and_hold, chomo_long_only
-from tools.metrics import sharpe_ratio, calmar_ratio
+from backtest.metrics import sharpe_ratio, calmar_ratio
 
 @dataclass
 class RunConfig:
     mongo_uri: str = "mongodb://localhost:27017"
-    mongo_db: str = "market"
+    mongo_db: str = "market_info"
     mongo_coll: str = "klines"
     symbol: str = "BTCUSDT"
     interval: str = "1h"
@@ -47,6 +47,7 @@ def run_backtest(cfg: RunConfig):
     calmar = calmar_ratio(res.equity, cfg.interval)
 
     return {
+        "klines": df,
         "buy_and_hold": {
             "total_return": bah.total_return,
             "equity_last": float(bah.equity.iloc[-1]),

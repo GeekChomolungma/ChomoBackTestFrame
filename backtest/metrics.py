@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Iterable
 import numpy as np
 import pandas as pd
-from .time_utils import annualization_factor
+from tools.time_utils import annualization_factor
 
 def max_drawdown(equity: pd.Series) -> float:
     cummax = equity.cummax()

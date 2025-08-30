@@ -3,6 +3,7 @@ import argparse, json, os
 import pandas as pd
 from config.config_loader import load_config_yaml, build_run_config
 from backtest.backtester import run_backtest
+from bt_plotter.backtest_plotter import BacktestPlotter
 
 def parse_args():
     ap = argparse.ArgumentParser(description="Run backtest with YAML config + .env")
@@ -15,7 +16,8 @@ def main():
     cfg_dict = load_config_yaml(args.config)
     run_cfg = build_run_config(cfg_dict)
     out = run_backtest(run_cfg)
-
+    BacktestPlotter().plot(out, title="Chomo Backtest", save_path=None, show=True)
+    
     summary = {
         "buy_and_hold": out["buy_and_hold"],
         "chomo": {k: out["chomo"][k] for k in ["total_return","win_rate","max_drawdown","equity_last","num_trades","sharpe","calmar"]},

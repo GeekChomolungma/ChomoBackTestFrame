@@ -6,19 +6,19 @@
 # csv_path: "/path/to/klines.csv"
 
 mongo_db: "market_info"
-mongo_coll: "BNBUSDT_1h_Binance"
+mongo_coll: "BTCUSDT_4h_Binance"
 
-symbol: "BNBUSDT"
-interval: "1h"
+symbol: "BTCUSDT"
+interval: "4h"
 
 # ISO8601 or epoch ms
-start: "2025-02-01T00:00:00Z"
+start: "2025-03-01T00:00:00Z"
 end:   "2025-09-01T00:00:00Z"
 
 ckpt_path: "model/checkpoints/ohlcv/20250830-122134_best_forBTC.pt"
 device: null
 
-fee_bps: 1.0
+fee_bps: 0.0
 slippage_bps: 0.0
 initial_capital: 10000.0
-threshold: 0.0
+threshold: 0.005

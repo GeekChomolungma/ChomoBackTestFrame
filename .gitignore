@@ -4,3 +4,4 @@ __pycache__/
 results/
 wandb/
 checkpoints/
+bt_out/
