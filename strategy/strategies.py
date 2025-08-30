@@ -28,7 +28,7 @@ def _apply_fees_slippage(mult: float, exec_cfg: ExecutionCfg, roundtrips: int = 
 
 def buy_and_hold(df: pd.DataFrame, cfg: PortfolioCfg, exec_cfg: ExecutionCfg) -> BuyHoldResult:
     prices = df["close"].to_numpy(dtype=np.float64)
-    ts = df["ts"]
+    ts = df["endtime"]
     if len(prices) < 2:
         raise ValueError("Need at least 2 prices for buy-and-hold.")
     gross = prices[-1] / prices[0]
@@ -58,19 +58,22 @@ class ChomoLongOnlyResult:
 def chomo_long_only(df: pd.DataFrame, model_wrapper, horizon: int,
                     cfg: PortfolioCfg, exec_cfg: ExecutionCfg, threshold: float = 0.0) -> ChomoLongOnlyResult:
     L = model_wrapper.window_len
+    rolling_win = model_wrapper.rolling_win
+
     prices = df["close"].to_numpy(dtype=np.float64)
-    ts = df["ts"].to_numpy()
+    ts = df["endtime"].to_numpy()
     n = len(df)
 
     equity = np.full(n, np.nan, dtype=np.float64)
     capital = cfg.initial_capital
-    equity[:L] = capital
-    i = L
+    equity[:L+rolling_win] = capital
     trades: List[Trade] = []
 
+    model_wrapper.prime_series(df) # prime the entire series once before the loop
+    
+    i = L + rolling_win
     while i + horizon < n:
-        window = df.iloc[i-L+1:i+1]
-        y_hat = model_wrapper.predict_logret(window)
+        y_hat = model_wrapper.predict_logret(this_index=i)
         if y_hat > threshold:
             entry_idx = i
             exit_idx = i + horizon
@@ -91,7 +94,7 @@ def chomo_long_only(df: pd.DataFrame, model_wrapper, horizon: int,
             equity[i] = capital
             i += 1
 
-    equity_series = pd.Series(equity, index=df["ts"]).ffill()
+    equity_series = pd.Series(equity, index=df["endtime"]).ffill()
     total_ret = float(equity_series.iloc[-1] / cfg.initial_capital - 1.0)
     wr = float(sum(t.win for t in trades) / len(trades)) if trades else 0.0
     mdd = float(max_drawdown(equity_series))

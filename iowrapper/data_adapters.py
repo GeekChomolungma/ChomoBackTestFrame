@@ -36,34 +36,20 @@ class MongoKlineSource(DataSource):
         if not rows:
             raise ValueError("No kline rows matched the query.")
         df = pd.DataFrame(rows)
-        mapping = {
-            "endtime": "ts",
-            "close": "close",
-            "open": "open",
-            "high": "high",
-            "low": "low",
-            "volume": "volume",
-        }
-        rename_map = {k:v for k,v in mapping.items() if k in df.columns}
-        df = df.rename(columns=rename_map)
-        required = ["ts", "open", "high", "low", "close", "volume"]
+        # mapping = {
+        #     "endtime": "ts",
+        #     "close": "close",
+        #     "open": "open",
+        #     "high": "high",
+        #     "low": "low",
+        #     "volume": "volume",
+        # }
+        # rename_map = {k:v for k,v in mapping.items() if k in df.columns}
+        # df = df.rename(columns=rename_map)
+        required = ["endtime", "open", "high", "low", "close", "volume"]
         missing = [c for c in required if c not in df.columns]
         if missing:
             raise ValueError(f"Missing required kline fields: {missing}")
-        df = df[required].sort_values("ts").reset_index(drop=True)
+        
+        df = df.sort_values(self.time_field).reset_index(drop=True)
         return df
-
-class CSVKlineSource(DataSource):
-    def __init__(self, path: str, ts_col: str="ts"):
-        self.path = path
-        self.ts_col = ts_col
-
-    def fetch(self) -> pd.DataFrame:
-        df = pd.read_csv(self.path)
-        if self.ts_col != "ts":
-            df = df.rename(columns={self.ts_col: "ts"})
-        required = ["ts","open","high","low","close","volume"]
-        for c in required:
-            if c not in df.columns:
-                raise ValueError(f"CSV missing '{c}' column")
-        return df[required].sort_values("ts").reset_index(drop=True)

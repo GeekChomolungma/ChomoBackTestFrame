@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 import pandas as pd
 from iowrapper.mongo_shell import MongoShell
-from iowrapper.data_adapters import MongoKlineSource, CSVKlineSource
+from iowrapper.data_adapters import MongoKlineSource
 from model.model_wrapper import ChomoModelWrapper
 from strategy.strategies import PortfolioCfg, ExecutionCfg, buy_and_hold, chomo_long_only
 from tools.metrics import sharpe_ratio, calmar_ratio
@@ -26,11 +26,8 @@ class RunConfig:
     csv_path: str | None = None   # if provided, use CSV source instead of Mongo
 
 def fetch_klines(cfg: RunConfig) -> pd.DataFrame:
-    if cfg.csv_path:
-        ds = CSVKlineSource(cfg.csv_path)
-    else:
-        mongo = MongoShell(cfg.mongo_uri, cfg.mongo_db)
-        ds = MongoKlineSource(mongo, cfg.mongo_db, cfg.mongo_coll, cfg.symbol, cfg.interval, cfg.start_ms, cfg.end_ms)
+    mongo = MongoShell(cfg.mongo_uri, cfg.mongo_db)
+    ds = MongoKlineSource(mongo, cfg.mongo_db, cfg.mongo_coll, cfg.symbol, cfg.interval, cfg.start_ms, cfg.end_ms)
     return ds.fetch()
 
 def run_backtest(cfg: RunConfig):
